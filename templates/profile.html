@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ profile_user }} — Pixgram{% endblock %}
+
+{% block content %}
+<div class="wide-container">
+
+  <div class="profile-header">
+    <div class="profile-avatar-lg">{{ profile_user[0].upper() }}</div>
+    <div class="profile-info">
+      <h2>{{ profile_user }}</h2>
+      <div class="profile-stats">
+        <span><strong>{{ posts|length }}</strong> posts</span>
+      </div>
+    </div>
+  </div>
+
+  {% if posts %}
+  <div class="profile-grid">
+    {% for post in posts %}
+    <div class="profile-thumb">
+      <img src="{{ url_for('static', filename='uploads/' + post.image) }}"
+           alt="Post by {{ profile_user }}" loading="lazy" />
+      <div class="thumb-overlay">
+        ❤️ {{ post.likes }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📷</div>
+    <h3>No posts yet</h3>
+    {% if session.user == profile_user %}
+    <p style="margin-bottom:16px; font-size:.9rem;">Share your first photo.</p>
+    <a href="{{ url_for('create_post') }}">✦ Create a post</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

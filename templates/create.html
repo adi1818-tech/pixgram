@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}New Post — Pixgram{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card create-card">
+    <h2>✦ New Post</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+      <div class="drop-zone" onclick="document.getElementById('file-input').click()">
+        <div class="icon">📷</div>
+        <p>Click to choose a photo</p>
+        <input id="file-input" type="file" name="image" accept="image/*" required
+               onchange="previewImage(this)" />
+      </div>
+
+      <div id="preview-wrap"></div>
+
+      <textarea class="caption-input" name="caption"
+                placeholder="Write a caption…"></textarea>
+
+      <button type="submit" class="btn-full" style="margin-top:16px;">Share Post</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function previewImage(input) {
+    const wrap = document.getElementById('preview-wrap');
+    wrap.innerHTML = '';
+    if (input.files && input.files[0]) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(input.files[0]);
+      wrap.appendChild(img);
+    }
+  }
+</script>
+{% endblock %}
