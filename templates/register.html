@@ -3,16 +3,6 @@
 
 {% block content %}
 <style>
-  body { background: #08080b !important; min-height: 100vh; margin: 0; }
-
-  .px-grid {
-    position: fixed; inset: 0; pointer-events: none;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 48px 48px;
-  }
-
   .px-orb {
     position: fixed; width: 560px; height: 560px; border-radius: 50%;
     background: radial-gradient(circle, rgba(200,30,30,0.13) 0%, transparent 70%);
@@ -20,10 +10,16 @@
     animation: px-breathe 6s ease-in-out infinite; pointer-events: none; z-index: 0;
   }
   @keyframes px-breathe {
-    0%,100% { transform: translate(-50%,-50%) scale(1);    opacity: .8; }
-    50%      { transform: translate(-50%,-50%) scale(1.15); opacity:  1; }
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity:.8; }
+    50%      { transform: translate(-50%,-50%) scale(1.15); opacity:1; }
   }
-
+  .px-grid {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
   .px-wrap {
     position: relative; z-index: 10;
     display: flex; flex-direction: column;
@@ -32,37 +28,31 @@
     animation: px-rise .8s cubic-bezier(.16,1,.3,1) forwards;
     opacity: 0; transform: translateY(24px);
   }
-  @keyframes px-rise { to { opacity: 1; transform: translateY(0); } }
+  @keyframes px-rise { to { opacity:1; transform:translateY(0); } }
 
-  .px-brand { text-align: center; margin-bottom: 48px; }
+  .px-brand { text-align: center; margin-bottom: 40px; }
   .px-logo {
-    font-family: 'Syne', 'Arial Black', sans-serif;
-    font-size: 52px; font-weight: 800; color: #ffffff;
-    letter-spacing: -2px; line-height: 1; display: block;
+    font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800;
+    color: #fff; letter-spacing: -2px; line-height: 1; display: block;
   }
   .px-logo span { color: #e03030; }
   .px-tagline {
     font-family: 'DM Mono', monospace; font-size: 11px;
     letter-spacing: .22em; color: #555; text-transform: uppercase; margin-top: 10px;
   }
-
   .px-card {
     width: 100%; max-width: 380px;
-    background: #111114;
-    border: .5px solid rgba(255,255,255,.08);
+    background: #111114; border: .5px solid rgba(255,255,255,.08);
     border-radius: 16px; padding: 40px 36px 36px;
   }
-
   .px-card-title {
-    font-family: 'Syne', 'Arial Black', sans-serif;
-    font-size: 22px; font-weight: 700; color: #fff;
-    margin-bottom: 6px; letter-spacing: -.5px;
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700;
+    color: #fff; margin-bottom: 6px; letter-spacing: -.5px;
   }
   .px-card-sub {
     font-family: 'DM Mono', monospace; font-size: 11px;
-    color: #444; letter-spacing: .05em; margin-bottom: 32px;
+    color: #444; letter-spacing: .05em; margin-bottom: 28px;
   }
-
   .px-field { margin-bottom: 18px; }
   .px-field label {
     display: block; font-family: 'DM Mono', monospace;
@@ -78,24 +68,20 @@
   }
   .px-field input::placeholder { color: #333; }
   .px-field input:focus { border-color: rgba(200,40,40,.5); background: #1e1820; }
-
   .px-hint {
     font-family: 'DM Mono', monospace; font-size: 10px;
     color: #333; margin-top: 6px; letter-spacing: .05em;
   }
-
   .px-btn {
-    width: 100%; margin-top: 30px; padding: 14px;
-    background: #e03030; color: #fff; border: none; border-radius: 8px;
-    font-family: 'DM Mono', monospace; font-size: 11px;
-    letter-spacing: .2em; text-transform: uppercase; cursor: pointer;
-    transition: background .2s, transform .1s;
+    width: 100%; padding: 14px; background: #e03030; color: #fff;
+    border: none; border-radius: 8px; font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    cursor: pointer; transition: background .2s, transform .1s; margin-top: 8px;
   }
   .px-btn:hover  { background: #c02020; }
   .px-btn:active { transform: scale(.99); }
-
   .px-divider {
-    display: flex; align-items: center; gap: 12px; margin: 28px 0;
+    display: flex; align-items: center; gap: 12px; margin: 24px 0;
   }
   .px-divider::before, .px-divider::after {
     content: ''; flex: 1; height: .5px; background: rgba(255,255,255,.07);
@@ -104,31 +90,24 @@
     font-family: 'DM Mono', monospace; font-size: 10px;
     color: #333; letter-spacing: .1em;
   }
-
   .px-footer {
     text-align: center; font-family: 'DM Mono', monospace;
     font-size: 11px; color: #444;
   }
-  .px-footer a { color: #e03030; text-decoration: none; transition: opacity .2s; }
+  .px-footer a { color: #e03030; text-decoration: none; }
   .px-footer a:hover { opacity: .7; }
-
   .px-flash {
-    width: 100%; max-width: 380px; margin-bottom: 16px;
-    padding: 12px 16px;
+    width: 100%; max-width: 380px; margin-bottom: 16px; padding: 12px 16px;
     background: rgba(200,30,30,.12); border: .5px solid rgba(200,30,30,.3);
     border-radius: 8px; font-family: 'DM Mono', monospace;
     font-size: 11px; color: #e07070;
   }
 </style>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-
 <div class="px-grid"></div>
 <div class="px-orb"></div>
 
 <div class="px-wrap">
-
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       {% for msg in messages %}
@@ -152,21 +131,15 @@
         <input type="text" name="username" placeholder="your_username" required autocomplete="username">
         <div class="px-hint">This is how others will find you</div>
       </div>
-
       <div class="px-field">
         <label>Password</label>
         <input type="password" name="password" placeholder="••••••••" required autocomplete="new-password">
       </div>
-
       <button type="submit" class="px-btn">Create Account →</button>
     </form>
 
     <div class="px-divider"><span>or</span></div>
-
-    <div class="px-footer">
-      Already have an account? <a href="{{ url_for('login') }}">Log in</a>
-    </div>
+    <div class="px-footer">Already have an account? <a href="{{ url_for('login') }}">Log in</a></div>
   </div>
-
 </div>
 {% endblock %}
