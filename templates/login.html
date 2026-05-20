@@ -2,26 +2,306 @@
 {% block title %}Login — Pixgram{% endblock %}
 
 {% block content %}
-<div class="auth-wrap">
-  <div class="auth-box">
-    <div class="card auth-card">
-      <span class="auth-logo">Pixgram</span>
-      <p class="auth-tagline">Sign in to see photos from your friends.</p>
+<style>
+  /* ── Page reset for login only ── */
+  body {
+    background: #08080b !important;
+    min-height: 100vh;
+    margin: 0;
+  }
 
-      <form method="POST">
-        <div class="form-group">
-          <input type="text" name="username" placeholder="Username" required autocomplete="username" />
-        </div>
-        <div class="form-group">
-          <input type="password" name="password" placeholder="Password" required autocomplete="current-password" />
-        </div>
-        <button type="submit" class="btn-full">Log In</button>
-      </form>
-    </div>
-    <div class="card auth-alt">
-      Don't have an account?
-      <a href="{{ url_for('register') }}">Sign up</a>
+  /* ── Glow orb ── */
+  .px-orb {
+    position: fixed;
+    width: 560px;
+    height: 560px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200, 30, 30, 0.13) 0%, transparent 70%);
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: px-breathe 6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes px-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1);    opacity: 0.8; }
+    50%       { transform: translate(-50%, -50%) scale(1.15); opacity: 1;   }
+  }
+
+  /* ── Subtle grid ── */
+  .px-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Center wrapper ── */
+  .px-wrap {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    animation: px-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  @keyframes px-rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Brand ── */
+  .px-brand {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .px-logo {
+    font-family: 'Syne', 'Arial Black', sans-serif;
+    font-size: 52px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -2px;
+    line-height: 1;
+    display: block;
+  }
+
+  .px-logo span {
+    color: #e03030;
+  }
+
+  .px-tagline {
+    font-family: 'DM Mono', 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: #555;
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  /* ── Card ── */
+  .px-card {
+    width: 100%;
+    max-width: 380px;
+    background: #111114;
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 40px 36px 36px;
+  }
+
+  .px-card-title {
+    font-family: 'Syne', 'Arial Black', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+
+  .px-card-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #444;
+    letter-spacing: 0.05em;
+    margin-bottom: 32px;
+  }
+
+  /* ── Fields ── */
+  .px-field {
+    margin-bottom: 18px;
+  }
+
+  .px-field label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 8px;
+  }
+
+  .px-field input {
+    width: 100%;
+    background: #1a1a1f;
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: #fff;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    box-sizing: border-box;
+  }
+
+  .px-field input::placeholder {
+    color: #333;
+  }
+
+  .px-field input:focus {
+    border-color: rgba(200, 40, 40, 0.5);
+    background: #1e1820;
+  }
+
+  /* ── Forgot ── */
+  .px-forgot {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -8px;
+    margin-bottom: 28px;
+  }
+
+  .px-forgot a {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #444;
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    transition: color 0.2s;
+  }
+
+  .px-forgot a:hover { color: #e03030; }
+
+  /* ── Button ── */
+  .px-btn {
+    width: 100%;
+    padding: 14px;
+    background: #e03030;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .px-btn:hover  { background: #c02020; }
+  .px-btn:active { transform: scale(0.99); }
+
+  /* ── Divider ── */
+  .px-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 28px 0;
+  }
+
+  .px-divider::before,
+  .px-divider::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .px-divider span {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #333;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── Footer ── */
+  .px-footer {
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #444;
+  }
+
+  .px-footer a {
+    color: #e03030;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .px-footer a:hover { opacity: 0.7; }
+
+  /* ── Flash messages ── */
+  .px-flash {
+    width: 100%;
+    max-width: 380px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: rgba(200, 30, 30, 0.12);
+    border: 0.5px solid rgba(200, 30, 30, 0.3);
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #e07070;
+  }
+</style>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+<div class="px-grid"></div>
+<div class="px-orb"></div>
+
+<div class="px-wrap">
+
+  <!-- Flash messages (Flask) -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="px-flash">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Brand -->
+  <div class="px-brand">
+    <span class="px-logo">Pix<span>gram</span></span>
+    <div class="px-tagline">Develop your moments</div>
+  </div>
+
+  <!-- Card -->
+  <div class="px-card">
+    <div class="px-card-title">Welcome back</div>
+    <div class="px-card-sub">Sign in to continue</div>
+
+    <form method="POST" action="">
+      {{ form.hidden_tag() if form is defined }}
+
+      <div class="px-field">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="your_username" required autocomplete="username">
+      </div>
+
+      <div class="px-field">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+
+      <div class="px-forgot">
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="px-btn">Log In →</button>
+    </form>
+
+    <div class="px-divider"><span>or</span></div>
+
+    <div class="px-footer">
+      No account? <a href="{{ url_for('register') }}">Sign up free</a>
     </div>
   </div>
+
 </div>
 {% endblock %}
