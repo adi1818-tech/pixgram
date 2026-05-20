@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}{{ challenge.title }} — Pixgram{% endblock %}
+
+{% block content %}
+<style>
+  body { background: #08080b !important; }
+  .cd-page {
+    max-width: 960px; margin: 0 auto; padding: 60px 24px;
+    font-family: 'DM Mono', monospace;
+    animation: px-rise .7s cubic-bezier(.16,1,.3,1) forwards;
+    opacity: 0; transform: translateY(20px);
+  }
+  @keyframes px-rise { to { opacity:1; transform:translateY(0); } }
+
+  /* Header */
+  .cd-header { margin-bottom: 48px; }
+  .cd-back { font-size: 10px; color: #444; text-decoration: none; letter-spacing: .1em; display: inline-block; margin-bottom: 20px; }
+  .cd-back:hover { color: #e03030; }
+  .cd-week { font-size: 9px; letter-spacing: .25em; color: #e03030; margin-bottom: 8px; }
+  .cd-title {
+    font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800;
+    color: #fff; letter-spacing: -1.5px; line-height: 1; margin-bottom: 14px;
+  }
+  .cd-prompt { font-size: 13px; color: #777; line-height: 1.7; max-width: 560px; margin-bottom: 20px; }
+  .cd-meta { display: flex; gap: 24px; font-size: 10px; color: #444; }
+
+  /* Submit form */
+  .cd-submit-wrap {
+    background: #111114; border: .5px solid rgba(224,48,48,.2);
+    border-radius: 12px; padding: 28px; margin-bottom: 48px;
+  }
+  .cd-submit-wrap h3 {
+    font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
+    color: #fff; margin-bottom: 20px; letter-spacing: -.3px;
+  }
+  .cd-field { margin-bottom: 16px; }
+  .cd-field label { display: block; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: #555; margin-bottom: 7px; }
+  .cd-field input[type="file"],
+  .cd-field textarea {
+    width: 100%; background: #1a1a1f; border: .5px solid rgba(255,255,255,.07);
+    border-radius: 8px; padding: 11px 14px; color: #fff;
+    font-family: 'DM Mono', monospace; font-size: 12px; outline: none;
+    transition: border-color .2s;
+  }
+  .cd-field textarea { resize: vertical; min-height: 70px; }
+  .cd-field input:focus, .cd-field textarea:focus { border-color: rgba(224,48,48,.4); }
+  .cd-btn {
+    padding: 12px 28px; background: #e03030; color: #fff; border: none;
+    border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .2em; text-transform: uppercase; cursor: pointer;
+    transition: background .2s;
+  }
+  .cd-btn:hover { background: #c02020; }
+
+  .cd-notice {
+    background: #111114; border: .5px solid rgba(255,255,255,.07);
+    border-radius: 12px; padding: 20px 24px;
+    font-size: 11px; color: #555; margin-bottom: 48px;
+  }
+
+  /* Entries grid */
+  .cd-entries-label {
+    font-size: 9px; letter-spacing: .25em; text-transform: uppercase;
+    color: #444; margin-bottom: 20px; padding-bottom: 12px;
+    border-bottom: .5px solid rgba(255,255,255,.06);
+  }
+  .cd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 16px; }
+
+  .cd-entry {
+    background: #111114; border: .5px solid rgba(255,255,255,.07);
+    border-radius: 12px; overflow: hidden;
+    transition: border-color .2s, transform .2s;
+  }
+  .cd-entry:hover { border-color: rgba(255,255,255,.15); transform: translateY(-2px); }
+  .cd-entry.top-entry { border-color: rgba(224,48,48,.35); }
+
+  .cd-entry img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+
+  .cd-entry-body { padding: 16px; }
+  .cd-entry-author { font-size: 11px; color: #fff; margin-bottom: 4px; }
+  .cd-entry-author span { color: #e03030; }
+  .cd-entry-caption { font-size: 11px; color: #555; line-height: 1.5; margin-bottom: 14px; }
+
+  .cd-vote-row { display: flex; align-items: center; gap: 10px; }
+  .cd-vote-btn {
+    padding: 7px 16px; background: #1a1a1f;
+    border: .5px solid rgba(255,255,255,.1);
+    border-radius: 6px; color: #aaa;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .1em; cursor: pointer;
+    transition: background .2s, color .2s, border-color .2s;
+  }
+  .cd-vote-btn:hover, .cd-vote-btn.voted {
+    background: rgba(224,48,48,.12); color: #e03030;
+    border-color: rgba(224,48,48,.3);
+  }
+  .cd-vote-count { font-size: 11px; color: #555; }
+
+  .cd-rank {
+    font-size: 9px; letter-spacing: .15em; padding: 3px 8px;
+    background: rgba(224,48,48,.1); color: #e03030;
+    border-radius: 4px; margin-left: auto;
+  }
+
+  .cd-empty { color: #333; font-size: 12px; padding: 24px 0; }
+
+  .flash-msg {
+    max-width: 960px; margin: 0 auto 20px; padding: 12px 24px;
+    background: rgba(224,48,48,.1); border: .5px solid rgba(224,48,48,.25);
+    border-radius: 8px; font-size: 11px; color: #e07070; font-family: 'DM Mono', monospace;
+  }
+  .flash-success {
+    background: rgba(30,180,80,.1); border-color: rgba(30,180,80,.25); color: #50c878;
+  }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in messages %}
+    <div class="flash-msg {% if cat == 'success' %}flash-success{% endif %}">{{ msg }}</div>
+  {% endfor %}
+{% endwith %}
+
+<div class="cd-page">
+
+  <!-- Header -->
+  <div class="cd-header">
+    <a class="cd-back" href="{{ url_for('challenges_list') }}">← All Challenges</a>
+    <div class="cd-week">WEEK {{ challenge.week_number }}</div>
+    <div class="cd-title">{{ challenge.title }}</div>
+    <div class="cd-prompt">{{ challenge.prompt }}</div>
+    <div class="cd-meta">
+      <span>{{ entries|length }} entr{{ 'y' if entries|length == 1 else 'ies' }}</span>
+      <span>Ends {{ challenge.end_date.strftime('%b %d') }}</span>
+      {% if is_active %}<span style="color:#e03030">● Accepting submissions</span>{% else %}<span>Closed</span>{% endif %}
+    </div>
+  </div>
+
+  <!-- Submit section -->
+  {% if is_active %}
+    {% if already_entered %}
+      <div class="cd-notice">You've already submitted your entry. You can still vote for others below.</div>
+    {% else %}
+      <div class="cd-submit-wrap">
+        <h3>Submit Your Entry</h3>
+        <form method="POST" action="{{ url_for('challenge_submit', challenge_id=challenge.id) }}" enctype="multipart/form-data">
+          <div class="cd-field">
+            <label>Your Photo</label>
+            <input type="file" name="image" accept="image/*" required>
+          </div>
+          <div class="cd-field">
+            <label>Caption (optional)</label>
+            <textarea name="caption" placeholder="Tell us about this shot..."></textarea>
+          </div>
+          <button type="submit" class="cd-btn">Submit Entry →</button>
+        </form>
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="cd-notice">This challenge has closed. Entries are shown by vote count.</div>
+  {% endif %}
+
+  <!-- Entries -->
+  <div class="cd-entries-label">{{ entries|length }} Entr{{ 'y' if entries|length == 1 else 'ies' }}</div>
+
+  {% if entries %}
+  <div class="cd-grid">
+    {% for entry in entries %}
+    <div class="cd-entry {% if loop.index == 1 %}top-entry{% endif %}">
+      <img src="{{ url_for('static', filename='uploads/' + entry.image) }}" alt="Entry by {{ entry.author }}">
+      <div class="cd-entry-body">
+        <div class="cd-entry-author">@<span>{{ entry.author }}</span></div>
+        {% if entry.caption %}<div class="cd-entry-caption">{{ entry.caption }}</div>{% endif %}
+        <div class="cd-vote-row">
+          {% if is_active and entry.author != current_user %}
+          <form method="POST" action="{{ url_for('challenge_vote', challenge_id=challenge.id, entry_id=entry.id) }}" style="margin:0">
+            <button type="submit" class="cd-vote-btn {% if current_user in entry.votes %}voted{% endif %}">
+              {% if current_user in entry.votes %}✓ Voted{% else %}Vote{% endif %}
+            </button>
+          </form>
+          {% endif %}
+          <span class="cd-vote-count">{{ entry.votes|length }} vote{{ 's' if entry.votes|length != 1 }}</span>
+          {% if loop.index == 1 and entries|length > 1 %}<span class="cd-rank">★ Leading</span>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="cd-empty">No entries yet. Be the first to submit.</div>
+  {% endif %}
+
+</div>
+{% endblock %}

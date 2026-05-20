@@ -19,6 +19,22 @@
       <textarea class="caption-input" name="caption"
                 placeholder="Write a caption…"></textarea>
 
+      <div class="form-group">
+        <label>Skill Tags</label>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
+          {% for tag in skill_tags %}
+          <label style="display:flex; align-items:center; gap:5px; cursor:pointer;
+                        background:#1a1a1f; border:.5px solid rgba(255,255,255,.08);
+                        border-radius:20px; padding:5px 12px;
+                        font-family:'DM Mono', monospace; font-size:11px; color:#aaa;">
+            <input type="checkbox" name="tags" value="{{ tag }}"
+                   style="accent-color:#e03050;">
+            {{ tag }}
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
       <button type="submit" class="btn-full" style="margin-top:16px;">Share Post</button>
     </form>
   </div>

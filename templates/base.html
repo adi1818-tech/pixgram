@@ -254,6 +254,7 @@
   <a href="{{ url_for('home') }}" class="logo">PIXGRAM</a>
   <div class="nav-links">
     <a href="{{ url_for('home') }}">🏠 Feed</a>
+    <a href="{{ url_for('challenges_list') }}">🏆 Challenges</a>
     <a href="{{ url_for('create_post') }}" class="btn-primary">✦ New Post</a>
     <a href="{{ url_for('profile', username=session.user) }}">👤 {{ session.user }}</a>
     <a href="{{ url_for('logout') }}">Logout</a>

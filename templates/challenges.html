@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Challenges — Pixgram{% endblock %}
+
+{% block content %}
+<style>
+  body { background: #08080b !important; }
+
+  .ch-page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    font-family: 'DM Mono', monospace;
+    animation: px-rise 0.7s cubic-bezier(.16,1,.3,1) forwards;
+    opacity: 0; transform: translateY(20px);
+  }
+  @keyframes px-rise { to { opacity:1; transform:translateY(0); } }
+
+  .ch-header { margin-bottom: 48px; }
+  .ch-header h1 {
+    font-family: 'Syne', 'Arial Black', sans-serif;
+    font-size: 42px; font-weight: 800;
+    color: #fff; letter-spacing: -1.5px; line-height: 1;
+  }
+  .ch-header h1 span { color: #e03030; }
+  .ch-header p { color: #555; font-size: 11px; letter-spacing: .15em; margin-top: 8px; }
+
+  .ch-section-label {
+    font-size: 9px; letter-spacing: .25em; text-transform: uppercase;
+    color: #444; margin-bottom: 20px; padding-bottom: 12px;
+    border-bottom: .5px solid rgba(255,255,255,.06);
+  }
+
+  .ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; margin-bottom: 56px; }
+
+  .ch-card {
+    background: #111114;
+    border: .5px solid rgba(255,255,255,.07);
+    border-radius: 12px;
+    padding: 28px 24px;
+    text-decoration: none;
+    display: block;
+    transition: border-color .2s, transform .2s;
+  }
+  .ch-card:hover { border-color: rgba(224,48,48,.4); transform: translateY(-2px); }
+
+  .ch-card-week { font-size: 9px; letter-spacing: .2em; color: #e03030; margin-bottom: 10px; }
+  .ch-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 700;
+    color: #fff; margin-bottom: 10px; letter-spacing: -.3px;
+  }
+  .ch-card-prompt { font-size: 11px; color: #555; line-height: 1.6; margin-bottom: 18px; }
+  .ch-card-meta { display: flex; justify-content: space-between; align-items: center; }
+  .ch-card-entries { font-size: 10px; color: #444; }
+  .ch-badge-active {
+    font-size: 9px; letter-spacing: .15em; padding: 4px 10px;
+    background: rgba(224,48,48,.12); color: #e03030;
+    border: .5px solid rgba(224,48,48,.3); border-radius: 20px;
+  }
+  .ch-badge-closed {
+    font-size: 9px; letter-spacing: .15em; padding: 4px 10px;
+    background: rgba(255,255,255,.04); color: #444;
+    border: .5px solid rgba(255,255,255,.06); border-radius: 20px;
+  }
+
+  .ch-empty { color: #333; font-size: 12px; padding: 24px 0; }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+<div class="ch-page">
+  <div class="ch-header">
+    <h1>Photo <span>Challenges</span></h1>
+    <p>Weekly prompts. Community votes. One winner featured.</p>
+  </div>
+
+  <div class="ch-section-label">Active This Week</div>
+  <div class="ch-grid">
+    {% for c in active %}
+    <a class="ch-card" href="{{ url_for('challenge_detail', challenge_id=c.id) }}">
+      <div class="ch-card-week">WEEK {{ c.week_number }}</div>
+      <div class="ch-card-title">{{ c.title }}</div>
+      <div class="ch-card-prompt">{{ c.prompt }}</div>
+      <div class="ch-card-meta">
+        <span class="ch-card-entries">{{ c.entries|length }} entr{{ 'y' if c.entries|length == 1 else 'ies' }}</span>
+        <span class="ch-badge-active">● Live</span>
+      </div>
+    </a>
+    {% else %}
+    <div class="ch-empty">No active challenges right now. Check back Monday.</div>
+    {% endfor %}
+  </div>
+
+  {% if past %}
+  <div class="ch-section-label">Past Challenges</div>
+  <div class="ch-grid">
+    {% for c in past %}
+    <a class="ch-card" href="{{ url_for('challenge_detail', challenge_id=c.id) }}">
+      <div class="ch-card-week">WEEK {{ c.week_number }}</div>
+      <div class="ch-card-title">{{ c.title }}</div>
+      <div class="ch-card-prompt">{{ c.prompt }}</div>
+      <div class="ch-card-meta">
+        <span class="ch-card-entries">{{ c.entries|length }} entries</span>
+        <span class="ch-badge-closed">Closed</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
