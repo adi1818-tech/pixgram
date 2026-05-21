@@ -3,109 +3,564 @@
 
 {% block content %}
 <style>
-  body { background: #08080b !important; }
+  .ch-bg {
+    position: fixed; inset: 0; overflow: hidden;
+    pointer-events: none; z-index: 0;
+  }
+
+  @keyframes ch-rotate {
+    from { transform: translate(-50%,-50%) rotate(0deg); }
+    to   { transform: translate(-50%,-50%) rotate(360deg); }
+  }
+
+  @keyframes ch-rise {
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  @keyframes ch-shimmer {
+    to { background-position: 200% center; }
+  }
+
+  @keyframes ch-pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.3; transform:scale(.6); }
+  }
 
   .ch-page {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 60px 24px;
+    position: relative; z-index: 10;
+    max-width: 1020px; margin: 0 auto;
+    padding: 0 28px 100px;
     font-family: 'DM Mono', monospace;
-    animation: px-rise 0.7s cubic-bezier(.16,1,.3,1) forwards;
-    opacity: 0; transform: translateY(20px);
-  }
-  @keyframes px-rise { to { opacity:1; transform:translateY(0); } }
-
-  .ch-header { margin-bottom: 48px; }
-  .ch-header h1 {
-    font-family: 'Syne', 'Arial Black', sans-serif;
-    font-size: 42px; font-weight: 800;
-    color: #fff; letter-spacing: -1.5px; line-height: 1;
-  }
-  .ch-header h1 span { color: #e03030; }
-  .ch-header p { color: #555; font-size: 11px; letter-spacing: .15em; margin-top: 8px; }
-
-  .ch-section-label {
-    font-size: 9px; letter-spacing: .25em; text-transform: uppercase;
-    color: #444; margin-bottom: 20px; padding-bottom: 12px;
-    border-bottom: .5px solid rgba(255,255,255,.06);
   }
 
-  .ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; margin-bottom: 56px; }
-
-  .ch-card {
-    background: #111114;
-    border: .5px solid rgba(255,255,255,.07);
-    border-radius: 12px;
-    padding: 28px 24px;
-    text-decoration: none;
-    display: block;
-    transition: border-color .2s, transform .2s;
+  /* ── Hero ── */
+  .ch-hero {
+    padding: 64px 0 52px;
+    opacity: 0; transform: translateY(28px);
+    animation: ch-rise .9s cubic-bezier(.16,1,.3,1) forwards;
   }
-  .ch-card:hover { border-color: rgba(224,48,48,.4); transform: translateY(-2px); }
 
-  .ch-card-week { font-size: 9px; letter-spacing: .2em; color: #e03030; margin-bottom: 10px; }
-  .ch-card-title {
+  .ch-eyebrow {
+    font-size: 9px; letter-spacing: .35em; color: #e03030;
+    text-transform: uppercase; margin-bottom: 22px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .ch-eyebrow::before {
+    content: ''; width: 28px; height: 1px; background: #e03030;
+  }
+
+  .ch-hero-title {
     font-family: 'Syne', sans-serif;
-    font-size: 20px; font-weight: 700;
+    font-size: clamp(52px, 8vw, 88px);
+    font-weight: 800; line-height: .92;
+    letter-spacing: -3px; margin-bottom: 28px;
+  }
+  .ch-hero-title .t-white { color: #fff; display: block; }
+  .ch-hero-title .t-red {
+    display: block;
+    background: linear-gradient(90deg, #e03030 0%, #ff7070 50%, #e03030 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: ch-shimmer 3s linear infinite;
+  }
+
+  .ch-hero-sub {
+    font-size: 13px; color: #4a4a4a; line-height: 1.8;
+    letter-spacing: .05em; max-width: 500px; margin-bottom: 36px;
+  }
+
+  .ch-pills {
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .ch-pill {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 18px;
+    background: rgba(255,255,255,.03);
+    border: .5px solid rgba(255,255,255,.08);
+    border-radius: 999px; font-size: 11px;
+    color: #555; letter-spacing: .08em;
+  }
+  .ch-pill strong { color: #ccc; font-weight: 600; }
+  .ch-live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #e03030;
+    animation: ch-pulse 1.8s ease-in-out infinite;
+  }
+
+  /* ── Divider ── */
+  .ch-hr {
+    height: .5px; background: rgba(255,255,255,.06); margin: 52px 0;
+  }
+
+  /* ── Countdown ── */
+  .ch-cd-wrap {
+    opacity: 0; transform: translateY(20px);
+    animation: ch-rise .9s .1s cubic-bezier(.16,1,.3,1) forwards;
+    margin-bottom: 52px;
+  }
+  .ch-section-label {
+    font-size: 9px; letter-spacing: .28em; text-transform: uppercase;
+    color: #383838; margin-bottom: 22px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .ch-section-label::after {
+    content: ''; flex: 1; height: .5px;
+    background: rgba(255,255,255,.05);
+  }
+
+  .ch-countdown {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .ch-cd-box {
+    background: #0d0d11;
+    border: .5px solid rgba(255,255,255,.08);
+    border-radius: 14px; padding: 22px 26px;
+    text-align: center; min-width: 96px;
+    position: relative; overflow: hidden;
+    transition: border-color .3s;
+  }
+  .ch-cd-box:hover { border-color: rgba(224,48,48,.3); }
+  .ch-cd-box::before {
+    content: ''; position: absolute;
+    top: 0; left: 20%; right: 20%; height: 1.5px;
+    background: linear-gradient(90deg, transparent, #e03030, transparent);
+  }
+  .ch-cd-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 40px; font-weight: 800;
+    color: #fff; line-height: 1; display: block;
+    letter-spacing: -1px;
+  }
+  .ch-cd-unit {
+    font-size: 8px; letter-spacing: .22em;
+    color: #383838; margin-top: 8px;
+    text-transform: uppercase; display: block;
+  }
+
+  /* ── How it works ── */
+  .ch-how-wrap {
+    opacity: 0; transform: translateY(20px);
+    animation: ch-rise .9s .15s cubic-bezier(.16,1,.3,1) forwards;
+    margin-bottom: 52px;
+  }
+  .ch-steps {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 3px;
+  }
+  .ch-step {
+    background: #0d0d11;
+    border: .5px solid rgba(255,255,255,.07);
+    border-radius: 14px; padding: 30px 26px;
+    position: relative; overflow: hidden;
+    transition: border-color .3s, transform .3s;
+    opacity: 0; transform: translateY(16px);
+  }
+  .ch-step:first-child { border-radius: 14px 4px 4px 14px; }
+  .ch-step:last-child  { border-radius: 4px 14px 14px 4px; }
+  .ch-step:hover {
+    border-color: rgba(224,48,48,.25);
+    transform: translateY(-4px) !important;
+  }
+  .ch-step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 52px; font-weight: 800;
+    color: rgba(255,255,255,.04);
+    line-height: 1; margin-bottom: 14px;
+    letter-spacing: -2px;
+  }
+  .ch-step-icon { font-size: 26px; display: block; margin-bottom: 14px; }
+  .ch-step-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px; font-weight: 700;
     color: #fff; margin-bottom: 10px; letter-spacing: -.3px;
   }
-  .ch-card-prompt { font-size: 11px; color: #555; line-height: 1.6; margin-bottom: 18px; }
-  .ch-card-meta { display: flex; justify-content: space-between; align-items: center; }
-  .ch-card-entries { font-size: 10px; color: #444; }
-  .ch-badge-active {
-    font-size: 9px; letter-spacing: .15em; padding: 4px 10px;
-    background: rgba(224,48,48,.12); color: #e03030;
-    border: .5px solid rgba(224,48,48,.3); border-radius: 20px;
+  .ch-step-desc {
+    font-size: 11px; color: #3a3a3a;
+    line-height: 1.8; letter-spacing: .04em;
   }
-  .ch-badge-closed {
-    font-size: 9px; letter-spacing: .15em; padding: 4px 10px;
-    background: rgba(255,255,255,.04); color: #444;
-    border: .5px solid rgba(255,255,255,.06); border-radius: 20px;
+  .ch-step::after {
+    content: ''; position: absolute;
+    bottom: 0; left: 15%; right: 15%; height: 1.5px;
+    background: linear-gradient(90deg, transparent, rgba(224,48,48,.3), transparent);
+    opacity: 0; transition: opacity .3s;
+  }
+  .ch-step:hover::after { opacity: 1; }
+
+  /* ── Featured challenge card ── */
+  .ch-active-wrap {
+    opacity: 0; transform: translateY(20px);
+    animation: ch-rise .9s .2s cubic-bezier(.16,1,.3,1) forwards;
+    margin-bottom: 52px;
+  }
+  .ch-featured {
+    background: #0d0d11;
+    border: .5px solid rgba(224,48,48,.18);
+    border-radius: 20px; overflow: hidden;
+    position: relative;
+    transition: border-color .3s, transform .3s;
+  }
+  .ch-featured:hover {
+    border-color: rgba(224,48,48,.4);
+    transform: translateY(-3px);
+  }
+  .ch-featured::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #e03030, #ff7070, #e03030);
+    background-size: 200% auto;
+    animation: ch-shimmer 3s linear infinite;
+  }
+  .ch-feat-inner { padding: 40px; }
+  .ch-feat-top {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+  }
+  .ch-feat-week {
+    font-size: 9px; letter-spacing: .25em;
+    color: #e03030; text-transform: uppercase;
+  }
+  .ch-feat-live {
+    display: flex; align-items: center; gap: 7px;
+    padding: 6px 14px;
+    background: rgba(224,48,48,.08);
+    border: .5px solid rgba(224,48,48,.2);
+    border-radius: 999px; font-size: 10px;
+    color: #e03030; letter-spacing: .12em;
+  }
+  .ch-feat-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(30px, 4vw, 44px);
+    font-weight: 800; color: #fff;
+    letter-spacing: -1.5px; line-height: 1.05;
+    margin-bottom: 16px;
+  }
+  .ch-feat-prompt {
+    font-size: 13px; color: #4a4a4a;
+    line-height: 1.85; max-width: 580px;
+    margin-bottom: 32px; letter-spacing: .04em;
+  }
+  .ch-feat-bottom {
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 16px;
+    padding-top: 24px;
+    border-top: .5px solid rgba(255,255,255,.05);
+  }
+  .ch-feat-meta { display: flex; gap: 24px; }
+  .ch-feat-meta-item { font-size: 11px; color: #333; letter-spacing: .06em; }
+  .ch-feat-meta-item strong { color: #888; display: block; font-size: 13px; margin-bottom: 2px; }
+
+  .ch-enter-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 32px;
+    background: #e03030; color: #fff;
+    border-radius: 10px; text-decoration: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: .2em;
+    text-transform: uppercase;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 8px 32px rgba(224,48,48,.25);
+  }
+  .ch-enter-btn:hover {
+    background: #c02020; color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(224,48,48,.35);
   }
 
-  .ch-empty { color: #333; font-size: 12px; padding: 24px 0; }
+  .ch-no-active {
+    padding: 48px; text-align: center;
+    background: #0d0d11;
+    border: .5px solid rgba(255,255,255,.06);
+    border-radius: 20px; color: #333;
+    font-size: 12px; letter-spacing: .08em;
+  }
+
+  /* ── Past challenges ── */
+  .ch-past-wrap {
+    opacity: 0; transform: translateY(20px);
+    animation: ch-rise .9s .25s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  .ch-past-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px,1fr));
+    gap: 10px;
+  }
+  .ch-past-card {
+    background: #0d0d11;
+    border: .5px solid rgba(255,255,255,.06);
+    border-radius: 14px; padding: 26px 24px;
+    text-decoration: none; display: block;
+    transition: border-color .25s, transform .25s;
+    opacity: 0; transform: translateY(14px);
+  }
+  .ch-past-card:hover {
+    border-color: rgba(255,255,255,.12);
+    transform: translateY(-3px) !important;
+  }
+  .ch-past-wk { font-size: 9px; letter-spacing: .2em; color: #e03030; margin-bottom: 9px; }
+  .ch-past-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 700;
+    color: #ddd; margin-bottom: 9px; letter-spacing: -.3px;
+  }
+  .ch-past-prompt { font-size: 11px; color: #333; line-height: 1.7; margin-bottom: 18px; }
+  .ch-past-foot {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .ch-past-count { font-size: 10px; color: #2e2e2e; }
+  .ch-closed {
+    font-size: 9px; letter-spacing: .12em; padding: 3px 10px;
+    background: rgba(255,255,255,.03);
+    border: .5px solid rgba(255,255,255,.06);
+    color: #2e2e2e; border-radius: 999px;
+  }
+
+  @media (max-width: 700px) {
+    .ch-steps { grid-template-columns: 1fr; }
+    .ch-step:first-child,
+    .ch-step:last-child { border-radius: 14px; }
+    .ch-hero-title { letter-spacing: -2px; }
+    .ch-cd-box { min-width: 72px; padding: 16px 18px; }
+    .ch-cd-num { font-size: 30px; }
+    .ch-feat-inner { padding: 26px; }
+  }
 </style>
 
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<!-- Floating rings background -->
+<div class="ch-bg" id="chBg"></div>
 
 <div class="ch-page">
-  <div class="ch-header">
-    <h1>Photo <span>Challenges</span></h1>
-    <p>Weekly prompts. Community votes. One winner featured.</p>
+
+  <!-- Hero -->
+  <div class="ch-hero">
+    <div class="ch-eyebrow">Weekly Competition</div>
+    <h1 class="ch-hero-title">
+      <span class="t-white">Photo</span>
+      <span class="t-red">Challenges</span>
+    </h1>
+    <p class="ch-hero-sub">
+      Every week a fresh prompt drops. Submit your best shot,
+      let the community vote, and claim your place at the top.
+    </p>
+    <div class="ch-pills">
+      {% if active %}
+      <div class="ch-pill">
+        <span class="ch-live-dot"></span>
+        <span><strong>{{ active|length }}</strong> Live Now</span>
+      </div>
+      {% endif %}
+      <div class="ch-pill">
+        <span>📅</span>
+        <span>Week <strong>{{ (active + past)|length }}</strong></span>
+      </div>
+      <div class="ch-pill">
+        <span>🏆</span>
+        <span><strong>{{ past|length }}</strong> Completed</span>
+      </div>
+      <div class="ch-pill">
+        <span>🗳️</span>
+        <span>One vote per challenge</span>
+      </div>
+    </div>
   </div>
 
-  <div class="ch-section-label">Active This Week</div>
-  <div class="ch-grid">
-    {% for c in active %}
-    <a class="ch-card" href="{{ url_for('challenge_detail', challenge_id=c.id) }}">
-      <div class="ch-card-week">WEEK {{ c.week_number }}</div>
-      <div class="ch-card-title">{{ c.title }}</div>
-      <div class="ch-card-prompt">{{ c.prompt }}</div>
-      <div class="ch-card-meta">
-        <span class="ch-card-entries">{{ c.entries|length }} entr{{ 'y' if c.entries|length == 1 else 'ies' }}</span>
-        <span class="ch-badge-active">● Live</span>
+  <div class="ch-hr"></div>
+
+  <!-- Countdown -->
+  {% if active %}
+  <div class="ch-cd-wrap">
+    <div class="ch-section-label">Challenge closes in</div>
+    <div class="ch-countdown"
+         id="countdown"
+         data-end="{{ active[0].end_date.strftime('%Y-%m-%dT%H:%M:%S') }}">
+      <div class="ch-cd-box">
+        <span class="ch-cd-num" id="cd-days">--</span>
+        <span class="ch-cd-unit">Days</span>
       </div>
-    </a>
+      <div class="ch-cd-box">
+        <span class="ch-cd-num" id="cd-hours">--</span>
+        <span class="ch-cd-unit">Hours</span>
+      </div>
+      <div class="ch-cd-box">
+        <span class="ch-cd-num" id="cd-mins">--</span>
+        <span class="ch-cd-unit">Mins</span>
+      </div>
+      <div class="ch-cd-box">
+        <span class="ch-cd-num" id="cd-secs">--</span>
+        <span class="ch-cd-unit">Secs</span>
+      </div>
+    </div>
+  </div>
+  <div class="ch-hr"></div>
+  {% endif %}
+
+  <!-- How it works -->
+  <div class="ch-how-wrap">
+    <div class="ch-section-label">How it works</div>
+    <div class="ch-steps">
+      <div class="ch-step">
+        <div class="ch-step-num">01</div>
+        <span class="ch-step-icon">📸</span>
+        <div class="ch-step-title">Submit Your Shot</div>
+        <div class="ch-step-desc">
+          Upload one photo that best captures the weekly prompt.
+          One entry per person — make it count.
+        </div>
+      </div>
+      <div class="ch-step">
+        <div class="ch-step-num">02</div>
+        <span class="ch-step-icon">🗳️</span>
+        <div class="ch-step-title">Community Votes</div>
+        <div class="ch-step-desc">
+          Browse every entry and cast your single vote.
+          You can change your mind until the challenge closes.
+        </div>
+      </div>
+      <div class="ch-step">
+        <div class="ch-step-num">03</div>
+        <span class="ch-step-icon">🏆</span>
+        <div class="ch-step-title">Winner Featured</div>
+        <div class="ch-step-desc">
+          Most votes wins. The winner earns a badge on their
+          profile and gets featured at the top of the app.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ch-hr"></div>
+
+  <!-- Active challenge -->
+  <div class="ch-active-wrap">
+    <div class="ch-section-label">Active This Week</div>
+    {% if active %}
+      {% for c in active %}
+      <div class="ch-featured">
+        <div class="ch-feat-inner">
+          <div class="ch-feat-top">
+            <div class="ch-feat-week">Week {{ c.week_number }}</div>
+            <div class="ch-feat-live">
+              <span class="ch-live-dot"></span> Accepting Submissions
+            </div>
+          </div>
+          <div class="ch-feat-title">{{ c.title }}</div>
+          <div class="ch-feat-prompt">{{ c.prompt }}</div>
+          <div class="ch-feat-bottom">
+            <div class="ch-feat-meta">
+              <div class="ch-feat-meta-item">
+                <strong>{{ c.entries|length }}</strong>
+                entr{{ 'y' if c.entries|length == 1 else 'ies' }} so far
+              </div>
+              <div class="ch-feat-meta-item">
+                <strong>{{ c.end_date.strftime('%b %d') }}</strong>
+                deadline
+              </div>
+            </div>
+            <a class="ch-enter-btn"
+               href="{{ url_for('challenge_detail', challenge_id=c.id) }}">
+              Enter Challenge →
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
     {% else %}
-    <div class="ch-empty">No active challenges right now. Check back Monday.</div>
-    {% endfor %}
+      <div class="ch-no-active">
+        No active challenge right now — check back Monday.
+      </div>
+    {% endif %}
   </div>
 
+  <!-- Past challenges -->
   {% if past %}
-  <div class="ch-section-label">Past Challenges</div>
-  <div class="ch-grid">
-    {% for c in past %}
-    <a class="ch-card" href="{{ url_for('challenge_detail', challenge_id=c.id) }}">
-      <div class="ch-card-week">WEEK {{ c.week_number }}</div>
-      <div class="ch-card-title">{{ c.title }}</div>
-      <div class="ch-card-prompt">{{ c.prompt }}</div>
-      <div class="ch-card-meta">
-        <span class="ch-card-entries">{{ c.entries|length }} entries</span>
-        <span class="ch-badge-closed">Closed</span>
-      </div>
-    </a>
-    {% endfor %}
+  <div class="ch-hr"></div>
+  <div class="ch-past-wrap">
+    <div class="ch-section-label">Past Challenges</div>
+    <div class="ch-past-grid">
+      {% for c in past %}
+      <a class="ch-past-card"
+         href="{{ url_for('challenge_detail', challenge_id=c.id) }}">
+        <div class="ch-past-wk">Week {{ c.week_number }}</div>
+        <div class="ch-past-title">{{ c.title }}</div>
+        <div class="ch-past-prompt">{{ c.prompt }}</div>
+        <div class="ch-past-foot">
+          <span class="ch-past-count">{{ c.entries|length }} entries</span>
+          <span class="ch-closed">Closed</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
   </div>
   {% endif %}
+
 </div>
+
+<script>
+  /* ── Floating aperture rings ── */
+  const bg = document.getElementById('chBg');
+  [
+    { s:700, t:'8%',  l:'72%', d:50, o:.05 },
+    { s:420, t:'65%', l:'4%',  d:65, o:.04 },
+    { s:280, t:'35%', l:'42%', d:32, o:.035 },
+    { s:190, t:'78%', l:'78%', d:48, o:.06 },
+    { s:130, t:'18%', l:'18%', d:38, o:.045 },
+    { s: 90, t:'50%', l:'60%', d:28, o:.05 },
+  ].forEach(r => {
+    const el = document.createElement('div');
+    el.style.cssText = `
+      position:absolute; border-radius:50%;
+      width:${r.s}px; height:${r.s}px;
+      top:${r.t}; left:${r.l};
+      border:.5px solid rgba(224,48,48,${r.o});
+      transform:translate(-50%,-50%);
+      animation:ch-rotate ${r.d}s linear infinite;
+    `;
+    const inner = el.cloneNode();
+    inner.style.width  = `${r.s*.55}px`;
+    inner.style.height = `${r.s*.55}px`;
+    inner.style.top = inner.style.left = '50%';
+    inner.style.animationDuration = `${r.d*.65}s`;
+    inner.style.animationDirection = 'reverse';
+    el.appendChild(inner);
+    bg.appendChild(el);
+  });
+
+  /* ── Live countdown ── */
+  const cdEl = document.getElementById('countdown');
+  if (cdEl) {
+    const end = new Date(cdEl.dataset.end);
+    const pads = n => String(n).padStart(2,'0');
+    const tick = () => {
+      const diff = end - Date.now();
+      if (diff <= 0) {
+        ['days','hours','mins','secs'].forEach(u =>
+          document.getElementById('cd-'+u).textContent = '00');
+        return;
+      }
+      document.getElementById('cd-days').textContent  = pads(Math.floor(diff/86400000));
+      document.getElementById('cd-hours').textContent = pads(Math.floor(diff%86400000/3600000));
+      document.getElementById('cd-mins').textContent  = pads(Math.floor(diff%3600000/60000));
+      document.getElementById('cd-secs').textContent  = pads(Math.floor(diff%60000/1000));
+    };
+    tick(); setInterval(tick, 1000);
+  }
+
+  /* ── Scroll reveal ── */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.ch-step, .ch-past-card').forEach((el, i) => {
+    el.style.transition = `opacity .6s ${i * .07}s ease, transform .6s ${i * .07}s ease`;
+    io.observe(el);
+  });
+</script>
+
 {% endblock %}
